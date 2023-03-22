@@ -1,0 +1,22 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+}
+
+.snake {
+    fill: #000;
+    stroke: #f00;
+    stroke-width: 2px;
+}
+
+.apple {
+    fill: #f00;
+}
+
+.game-over {
+    border-color: #fcc !important;
+}
