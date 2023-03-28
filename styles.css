@@ -9,6 +9,7 @@ body {
 
 .snake-head {
     fill: #8cbc93;
+    stroke:#4c8354;
     stroke-width: 2px;
 }
 
