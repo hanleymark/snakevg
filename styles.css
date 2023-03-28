@@ -7,10 +7,21 @@ body {
     width: 100%;
 }
 
-.snake {
-    fill: #000;
-    stroke: #f00;
+.snake-head {
+    fill: #8cbc93;
     stroke-width: 2px;
+}
+
+/* .snake-body {
+    fill: #528058;
+    stroke-width: 2px;
+} */
+
+.board {
+    border: cadetblue 16px solid;
+    background-color: #000;
+    background-image: url("./images/bg-space.jpg");
+    background-size: cover;
 }
 
 .apple {
@@ -19,4 +30,21 @@ body {
 
 .game-over {
     border-color: #fcc !important;
+}
+
+.snake-body:nth-child(4n) {
+    fill: #4c8354;
+}
+.snake-body:nth-child(4n+1) {
+    fill: #609869;
+}
+.snake-body:nth-child(4n+2) {
+    fill: #8cbc93;
+}
+.snake-body:nth-child(4n+3) {
+    fill: #609869;
+}
+
+.snake-body2 {
+    fill: #8cbc93;
 }
