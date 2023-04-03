@@ -1,0 +1,51 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+}
+
+.snake-head {
+    fill: #8cbc93;
+    stroke:#4c8354;
+    stroke-width: 2px;
+}
+
+/* .snake-body {
+    fill: #528058;
+    stroke-width: 2px;
+} */
+
+.board {
+    border: cadetblue 16px solid;
+    background-color: #000;
+    background-image: url("./images/bg-space.jpg");
+    background-size: cover;
+}
+
+.apple {
+    fill: #f00;
+}
+
+.game-over {
+    border-color: #fcc !important;
+}
+
+.snake-body:nth-child(4n) {
+    fill: #4c8354;
+}
+.snake-body:nth-child(4n+1) {
+    fill: #609869;
+}
+.snake-body:nth-child(4n+2) {
+    fill: #8cbc93;
+}
+.snake-body:nth-child(4n+3) {
+    fill: #609869;
+}
+
+.snake-body2 {
+    fill: #8cbc93;
+}
