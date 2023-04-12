@@ -1,3 +1,5 @@
+import { Board } from "./modules/board.js";
+
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
 // Set up game attributes
@@ -5,7 +7,7 @@ const BOARD_WIDTH = 50; // Width of board in blocks
 const BOARD_HEIGHT = 30; // Height of board in blocks
 const BLOCK_SIZE = 16; // Size of one block in pixels
 const TICK_MS = 250; // Time in milliseconds for each game tick
-const SNAKE_START_LENGTH = 20; // Initial length of snake
+const SNAKE_START_LENGTH = 3; // Initial length of snake
 
 // Create snake Direction enum for readability
 const Direction = Object.freeze({
@@ -15,8 +17,13 @@ const Direction = Object.freeze({
   right: 3,
 });
 
-let board = setUpBoard(BOARD_WIDTH, BOARD_HEIGHT, BLOCK_SIZE);
-document.body.appendChild(board);
+const board = new Board(
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  BLOCK_SIZE,
+  "./images/bg-space.jpg"
+);
+document.body.appendChild(board.element);
 
 // Set initial direction of snake
 let snakeDirection = Direction.right;
@@ -26,8 +33,15 @@ let snake = setUpSnake(SNAKE_START_LENGTH);
 
 document.body.appendChild(board);
 
+// Generate food
+// Generate random x and y coords
+// Check if coords are occupied by snake
+// If not, create food at coords
+
+
 // Display snake
 displaySnake();
+let food = new Food();
 
 document.addEventListener("keydown", (event) => {
   const key = event.key;
@@ -40,6 +54,43 @@ document.addEventListener("keydown", (event) => {
 
 // Set up game loop timer
 setInterval(gameLoop, TICK_MS);
+
+function Food() {
+  this.xPos = 0;
+  this.yPos = 0;
+  const radius = BLOCK_SIZE / 2;
+
+  let squareIsOccupied = true;
+
+  while (squareIsOccupied) {
+    this.xPos = generateRandomLocation(BOARD_WIDTH, BLOCK_SIZE);
+    this.yPos = generateRandomLocation(BOARD_HEIGHT, BLOCK_SIZE);
+    squareIsOccupied = isSquareOccupied(this.xPos, this.yPos);
+  }
+
+  this.svgGroup = document.createElementNS(SVG_NAMESPACE, "g");
+  this.svgGroup.setAttributeNS(null, "class", "food-block");
+  const circle = document.createElementNS(SVG_NAMESPACE, "circle");
+  circle.setAttributeNS(null, "cx", this.xPos);
+  circle.setAttributeNS(null, "cy", this.yPos);
+  circle.setAttributeNS(null, "r", radius);
+  circle.setAttributeNS(null, "class", "food"); // Set class name so it can be styled
+  this.svgGroup.appendChild(circle);
+  board.appendChild(this.svgGroup);
+}
+
+function isSquareOccupied(x,y) {
+  for (let snakePart of snake) {
+    if (snakePart.xPos === x && snakePart.yPos === y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function generateRandomLocation(boardSize, blockSize) {
+  return Math.floor(Math.random() * boardSize) * blockSize;
+}
 
 function SnakePart(xPos, yPos, partName, direction) {
   this.xPos = xPos;
