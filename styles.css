@@ -1,4 +1,10 @@
-html,
+html {
+    /* Set default values for board colours and block size */
+    --board-border-color: #82beec;
+    --board-bg-color: #000;
+    --block-size: 16px;
+}
+
 body {
     height: 100%;
     margin: 0;
@@ -11,41 +17,26 @@ body {
     fill: #8cbc93;
     stroke:#4c8354;
     stroke-width: 2px;
+    z-index: 1;
 }
 
-/* .snake-body {
-    fill: #528058;
+.snake-body {
+    fill: #8cbc93;
+    stroke:#4c8354;
     stroke-width: 2px;
-} */
+    z-index: 1;
+}
 
 .board {
-    border: cadetblue 16px solid;
-    background-color: #000;
-    background-image: url("./images/bg-space.jpg");
-    background-size: cover;
+    border: 16px solid var(--board-border-color);
+    background-color: var(--board-bg-color);
+    border-radius: calc(var(--block-size) / 2);
 }
 
-.apple {
+.food {
     fill: #f00;
 }
 
 .game-over {
     border-color: #fcc !important;
-}
-
-.snake-body:nth-child(4n) {
-    fill: #4c8354;
-}
-.snake-body:nth-child(4n+1) {
-    fill: #609869;
-}
-.snake-body:nth-child(4n+2) {
-    fill: #8cbc93;
-}
-.snake-body:nth-child(4n+3) {
-    fill: #609869;
-}
-
-.snake-body2 {
-    fill: #8cbc93;
 }
