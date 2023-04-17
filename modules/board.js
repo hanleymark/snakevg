@@ -9,19 +9,20 @@ export class Board {
     borderColour = "turquoise",
     backgroundColour = "#000",
     snakeDirection = Direction.right,
-    tickMS = 250
+    tickMS = 1000
   ) {
     this.width = width;
     this.height = height;
     this.blockSize = blockSize;
     this.snakeDirection = snakeDirection;
+    this.tickMS = tickMS;
     this.svgNamespace = "http://www.w3.org/2000/svg";
     this.boardElement = document.createElementNS(this.svgNamespace, "svg");
     this.snakeElement = document.createElementNS(this.svgNamespace, "g");
     this.snake = [];
     this.food = null;
     this.setUpBoard(borderColour, backgroundColour, backgroundImage);
-    this.setUpSnake(10);
+    this.setUpSnake();
     this.displaySnake();
     this.setUpKeyboardListeners();
     this.tick = setInterval(this.gameLoop.bind(this), tickMS);
@@ -35,6 +36,7 @@ export class Board {
     docRoot.style.setProperty("--block-size", `${this.blockSize}px`);
     docRoot.style.setProperty("--board-border-color", borderColour);
     docRoot.style.setProperty("--board-bg-color", backgroundColour);
+    docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
 
     // Set board svg element size
     this.boardElement.setAttributeNS(
@@ -87,10 +89,32 @@ export class Board {
     this.snake.forEach((part) => {
       const svgCircle = document.createElementNS(this.svgNamespace, "circle");
 
-      svgCircle.setAttributeNS(null, "class", part.partName);
+      let cssAnimation;
+
+      switch (part.direction) {
+        case Direction.up:
+          cssAnimation = "animate-up";
+          break;
+        case Direction.down:
+          cssAnimation = "animate-down";
+          break;
+        case Direction.left:
+          cssAnimation = "animate-left";
+          break;
+        case Direction.right:
+          cssAnimation = "animate-right";
+          break;
+      }
+
       svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
       svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
       svgCircle.setAttributeNS(null, "r", this.blockSize / 2);
+
+      svgCircle.setAttributeNS(
+        null,
+        "class",
+        `${part.partName} ${cssAnimation}`
+      );
 
       this.snakeElement.appendChild(svgCircle);
     });
@@ -103,13 +127,15 @@ export class Board {
     const increment = this.getXYIncrement();
     const nextX = this.snake[0].x + increment.x;
     const nextY = this.snake[0].y + increment.y;
-    
+
     // Remove the tail element from the snake array
-    this.snake.pop(); 
+    this.snake.pop();
     // Set the old head element to be a body part
-    this.snake[0].partName = "snake-body"; 
+    this.snake[0].partName = "snake-body";
     // Add a new head element to the snake array
-    this.snake.unshift(new SnakePart(nextX, nextY, "snake-head", this.snakeDirection));
+    this.snake.unshift(
+      new SnakePart(nextX, nextY, "snake-head", this.snakeDirection)
+    );
 
     // Display snake
     this.displaySnake();
