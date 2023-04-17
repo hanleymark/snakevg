@@ -17,16 +17,20 @@ body {
     fill: #8cbc93;
     stroke:#4c8354;
     stroke-width: 2px;
+    z-index: 1;
 }
 
-/* .snake-body {
-    fill: #528058;
+.snake-body {
+    fill: #8cbc93;
+    stroke:#4c8354;
     stroke-width: 2px;
-} */
+    z-index: 1;
+}
 
 .board {
     border: 16px solid var(--board-border-color);
     background-color: var(--board-bg-color);
+    border-radius: calc(var(--block-size) / 2);
 }
 
 .food {
@@ -35,21 +39,4 @@ body {
 
 .game-over {
     border-color: #fcc !important;
-}
-
-.snake-body:nth-child(4n) {
-    fill: #4c8354;
-}
-.snake-body:nth-child(4n+1) {
-    fill: #609869;
-}
-.snake-body:nth-child(4n+2) {
-    fill: #8cbc93;
-}
-.snake-body:nth-child(4n+3) {
-    fill: #609869;
-}
-
-.snake-body2 {
-    fill: #8cbc93;
 }
