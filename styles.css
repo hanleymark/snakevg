@@ -3,6 +3,7 @@ html {
     --board-border-color: #82beec;
     --board-bg-color: #000;
     --block-size: 16px;
+    --tick-ms: 250ms;
 }
 
 body {
@@ -14,15 +15,15 @@ body {
 }
 
 .snake-head {
-    fill: #8cbc93;
-    stroke:#4c8354;
+    fill: #506b54;
+    stroke: #4c8354;
     stroke-width: 2px;
     z-index: 1;
 }
 
 .snake-body {
     fill: #8cbc93;
-    stroke:#4c8354;
+    stroke: #4c8354;
     stroke-width: 2px;
     z-index: 1;
 }
@@ -37,6 +38,66 @@ body {
     fill: #f00;
 }
 
-.game-over {
-    border-color: #fcc !important;
+.animate-up {
+    animation-name: slide-up;
+    animation-duration: var(--tick-ms);
+    animation-timing-function: linear;
+}
+
+.animate-down {
+    animation-name: slide-down;
+    animation-duration: var(--tick-ms);
+    animation-timing-function: linear;
+}
+
+.animate-left {
+    animation-name: slide-left;
+    animation-duration: var(--tick-ms);
+    animation-timing-function: linear;
+}
+
+.animate-right {
+    animation-name: slide-right;
+    animation-duration: var(--tick-ms);
+    animation-timing-function: linear;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(0, calc( 0px - var(--block-size)));
+    }
+}
+
+@keyframes slide-down {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(0, var(--block-size));
+    }
+}
+
+@keyframes slide-left {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(calc( 0px - var(--block-size)), 0);
+    }
+}
+
+@keyframes slide-right {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(var(--block-size), 0);
+    }
 }

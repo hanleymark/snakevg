@@ -9,22 +9,23 @@ export class Board {
     borderColour = "turquoise",
     backgroundColour = "#000",
     snakeDirection = Direction.right,
-    tickMS = 250
+    tickMS = 200
   ) {
     this.width = width;
     this.height = height;
     this.blockSize = blockSize;
     this.snakeDirection = snakeDirection;
+    this.tickMS = tickMS;
     this.svgNamespace = "http://www.w3.org/2000/svg";
     this.boardElement = document.createElementNS(this.svgNamespace, "svg");
     this.snakeElement = document.createElementNS(this.svgNamespace, "g");
     this.snake = [];
     this.food = null;
     this.setUpBoard(borderColour, backgroundColour, backgroundImage);
-    this.setUpSnake(10);
+    this.setUpSnake();
     this.displaySnake();
     this.setUpKeyboardListeners();
-    this.tick = setInterval(this.gameLoop.bind(this), tickMS);
+    // this.tick = setInterval(this.gameLoop.bind(this), tickMS);
   }
 
   setUpBoard(borderColour, backgroundColour, backgroundImage) {
@@ -35,6 +36,7 @@ export class Board {
     docRoot.style.setProperty("--block-size", `${this.blockSize}px`);
     docRoot.style.setProperty("--board-border-color", borderColour);
     docRoot.style.setProperty("--board-bg-color", backgroundColour);
+    docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
 
     // Set board svg element size
     this.boardElement.setAttributeNS(
@@ -69,8 +71,6 @@ export class Board {
     }
   }
 
-  moveSnake(direction) {}
-
   render() {
     const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -83,34 +83,93 @@ export class Board {
   displaySnake() {
     // Clear snake element of all children
     this.snakeElement.innerHTML = "";
-    // Iterate through snake array and create svg elements for each part
-    this.snake.forEach((part) => {
+    // Iterate backwards through snake array and create svg elements for each part
+    this.snake.reduceRight((_, part) => {
       const svgCircle = document.createElementNS(this.svgNamespace, "circle");
 
-      svgCircle.setAttributeNS(null, "class", part.partName);
+      let cssAnimation;
+
+      switch (part.direction) {
+        case Direction.up:
+          cssAnimation = "animate-up";
+          break;
+        case Direction.down:
+          cssAnimation = "animate-down";
+          break;
+        case Direction.left:
+          cssAnimation = "animate-left";
+          break;
+        case Direction.right:
+          cssAnimation = "animate-right";
+          break;
+      }
+
       svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
       svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
       svgCircle.setAttributeNS(null, "r", this.blockSize / 2);
 
+      svgCircle.setAttributeNS(
+        null,
+        "class",
+        `${part.partName} ${cssAnimation}`
+      );
+
+      if (part.partName === "snake-head") {
+        svgCircle.addEventListener("animationend", () => {
+          this.gameLoop();
+        });
+      }
+
       this.snakeElement.appendChild(svgCircle);
-    });
+    },null);
 
     this.boardElement.appendChild(this.snakeElement);
   }
 
   gameLoop() {
+    // Remove event listener from head element
+    const oldSnakeHeadElement = document.querySelector(".snake-head");
+    oldSnakeHeadElement.removeEventListener("animationend", this.gameLoop);
+    // Update next position of old snake head
+    const oldSnakeHead = this.snake[0];
+
     // Get the x and y increments for the snake's direction
-    const increment = this.getXYIncrement();
+    const increment = this.getXYIncrement(this.snakeDirection);
     const nextX = this.snake[0].x + increment.x;
     const nextY = this.snake[0].y + increment.y;
-    
-    // Remove the tail element from the snake array
-    this.snake.pop(); 
-    // Set the old head element to be a body part
-    this.snake[0].partName = "snake-body"; 
-    // Add a new head element to the snake array
-    this.snake.unshift(new SnakePart(nextX, nextY, "snake-head", this.snakeDirection));
 
+    // Remove the tail element from the snake array
+    this.snake.pop();
+    // Set the old head element to be a body part and remove event listener
+    oldSnakeHead.partName = "snake-body";
+    // Add a new head element to the snake array
+
+    const newSnakeHead = new SnakePart(
+      nextX,
+      nextY,
+      "snake-head",
+      this.snakeDirection
+    );
+    if (oldSnakeHead.direction !== this.snakeDirection) {
+      newSnakeHead.x += this.getXYIncrement(oldSnakeHead.direction).x;
+      newSnakeHead.y += this.getXYIncrement(oldSnakeHead.direction).y;
+      switch (this.snakeDirection) {
+        case Direction.up:
+          newSnakeHead.y += 1;
+          break;
+        case Direction.down:
+          newSnakeHead.y -= 1;
+          break;
+        case Direction.left:
+          newSnakeHead.x += 1;
+          break;
+        case Direction.right:
+          newSnakeHead.x -= 1;
+          break;
+      }
+    }
+
+    this.snake.unshift(newSnakeHead);
     // Display snake
     this.displaySnake();
   }
@@ -139,9 +198,9 @@ export class Board {
     });
   }
 
-  getXYIncrement() {
+  getXYIncrement(direction) {
     let increment;
-    switch (this.snakeDirection) {
+    switch (direction) {
       case Direction.up:
         increment = { x: 0, y: -1 };
         break;
