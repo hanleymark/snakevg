@@ -15,7 +15,7 @@ body {
 }
 
 .snake-head {
-    fill: #8cbc93;
+    fill: #506b54;
     stroke: #4c8354;
     stroke-width: 2px;
     z-index: 1;
