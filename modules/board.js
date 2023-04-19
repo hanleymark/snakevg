@@ -9,7 +9,7 @@ export class Board {
     borderColour = "turquoise",
     backgroundColour = "#000",
     snakeDirection = Direction.right,
-    tickMS = 200
+    tickMS = 1000
   ) {
     this.width = width;
     this.height = height;
@@ -83,12 +83,25 @@ export class Board {
   displaySnake() {
     // Clear snake element of all children
     this.snakeElement.innerHTML = "";
+    // Declare eye elements
+    let svgLeftEyeGroup;
+    let svgRightEyeGroup;
+    let svgEyeWhite;
+    let svgEyeBlack;
     // Iterate backwards through snake array and create svg elements for each part
     this.snake.reduceRight((_, part) => {
+      const svgSnakeSectionGroup = document.createElementNS(
+        this.svgNamespace,
+        "g"
+      );
       const svgCircle = document.createElementNS(this.svgNamespace, "circle");
 
-      let cssAnimation;
+      svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
+      svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
+      svgCircle.setAttributeNS(null, "r", this.blockSize / 2);
+      //if (part.direction === Direction.up || part.direction === Direction.down)
 
+      let cssAnimation;
       switch (part.direction) {
         case Direction.up:
           cssAnimation = "animate-up";
@@ -104,24 +117,52 @@ export class Board {
           break;
       }
 
-      svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
-      svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
-      svgCircle.setAttributeNS(null, "r", this.blockSize / 2);
-
-      svgCircle.setAttributeNS(
+      svgSnakeSectionGroup.setAttributeNS(
         null,
         "class",
         `${part.partName} ${cssAnimation}`
       );
 
+      // Set up animation end event listener to head element to call game loop iteration
       if (part.partName === "snake-head") {
-        svgCircle.addEventListener("animationend", () => {
+        // Set up eye svg elements for snake head
+        svgLeftEyeGroup = document.createElementNS(this.svgNamespace, "g");
+        svgEyeWhite = document.createElementNS(this.svgNamespace, "circle");
+        svgEyeBlack = document.createElementNS(this.svgNamespace, "circle");
+        svgEyeWhite.setAttributeNS(null, "r", this.blockSize / 4);
+        svgEyeBlack.setAttributeNS(null, "r", this.blockSize / 8);
+        svgEyeWhite.setAttributeNS(null, "class", "snake-eye-white");
+        svgEyeBlack.setAttributeNS(null, "class", "snake-eye-black");
+        svgEyeWhite.setAttributeNS(null, "cx", (part.x * this.blockSize) - (this.blockSize / 4));
+        svgEyeWhite.setAttributeNS(null, "cy", part.y * this.blockSize);
+        svgEyeBlack.setAttributeNS(null, "cx", (part.x * this.blockSize) - (this.blockSize / 4));
+        svgEyeBlack.setAttributeNS(null, "cy", part.y * this.blockSize);
+        svgLeftEyeGroup.appendChild(svgEyeWhite);
+        svgLeftEyeGroup.appendChild(svgEyeBlack);
+        svgRightEyeGroup = svgLeftEyeGroup.cloneNode(true);
+        svgRightEyeGroup.childNodes[0].setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize + this.blockSize / 4
+        );
+        svgRightEyeGroup.childNodes[1].setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize + this.blockSize / 4
+        );
+        // Set up animation end event listener to head element to call game loop iteration
+        svgSnakeSectionGroup.addEventListener("animationend", () => {
           this.gameLoop();
         });
       }
-
       this.snakeElement.appendChild(svgCircle);
-    },null);
+      svgSnakeSectionGroup.appendChild(svgCircle);
+      if (svgLeftEyeGroup) {
+        svgSnakeSectionGroup.appendChild(svgLeftEyeGroup);
+        svgSnakeSectionGroup.appendChild(svgRightEyeGroup);
+      }
+      this.snakeElement.appendChild(svgSnakeSectionGroup);
+    }, null);
 
     this.boardElement.appendChild(this.snakeElement);
   }
