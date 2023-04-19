@@ -88,6 +88,7 @@ export class Board {
     let svgRightEyeGroup;
     let svgEyeWhite;
     let svgEyeBlack;
+
     // Iterate backwards through snake array and create svg elements for each part
     this.snake.reduceRight((_, part) => {
       const svgSnakeSectionGroup = document.createElementNS(
@@ -99,7 +100,6 @@ export class Board {
       svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
       svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
       svgCircle.setAttributeNS(null, "r", this.blockSize / 1.75);
-      //if (part.direction === Direction.up || part.direction === Direction.down)
 
       let cssAnimation;
       switch (part.direction) {
@@ -156,6 +156,7 @@ export class Board {
         }
 
         svgLeftEyeGroup = document.createElementNS(this.svgNamespace, "g");
+
         svgEyeWhite = document.createElementNS(this.svgNamespace, "circle");
         svgEyeBlack = document.createElementNS(this.svgNamespace, "circle");
         svgEyeWhite.setAttributeNS(null, "r", this.blockSize / 4);
@@ -184,6 +185,7 @@ export class Board {
         );
         svgLeftEyeGroup.appendChild(svgEyeWhite);
         svgLeftEyeGroup.appendChild(svgEyeBlack);
+
         svgRightEyeGroup = svgLeftEyeGroup.cloneNode(true);
         svgRightEyeGroup.childNodes[0].setAttributeNS(
           null,
@@ -215,7 +217,19 @@ export class Board {
       if (svgLeftEyeGroup) {
         svgSnakeSectionGroup.appendChild(svgLeftEyeGroup);
         svgSnakeSectionGroup.appendChild(svgRightEyeGroup);
+        const svgLeftEyelid = svgLeftEyeGroup.childNodes[0].cloneNode(true);
+        const svgRightEyelid = svgRightEyeGroup.childNodes[0].cloneNode(true);
+        svgLeftEyelid.setAttributeNS(null, "class", "snake-eyelid");
+        svgRightEyelid.setAttributeNS(null, "class", "snake-eyelid");
+        svgSnakeSectionGroup.appendChild(svgLeftEyelid);
+        svgSnakeSectionGroup.appendChild(svgRightEyelid);
+        // Randomly decide whether to blink eyes
+        if (Math.random() < 0.2) {
+          svgLeftEyelid.setAttributeNS(null, "class", "blink-animation");
+          svgRightEyelid.setAttributeNS(null, "class", "blink-animation");
+        }
       }
+
       this.snakeElement.appendChild(svgSnakeSectionGroup);
     }, null);
 
