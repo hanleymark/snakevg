@@ -28,6 +28,18 @@ body {
     z-index: 1;
 }
 
+.snake-head .snake-eye-white {
+    fill: #fff;
+    z-index: 2;
+    stroke: none;
+}
+
+.snake-head .snake-eye-black {
+    fill: #000;
+    z-index: 3;
+    stroke: none;
+}
+
 .board {
     border: 16px solid var(--board-border-color);
     background-color: var(--board-bg-color);
@@ -68,7 +80,7 @@ body {
     }
 
     to {
-        transform: translate(0, calc( 0px - var(--block-size)));
+        transform: translate(0, calc(0px - var(--block-size)));
     }
 }
 
@@ -88,7 +100,7 @@ body {
     }
 
     to {
-        transform: translate(calc( 0px - var(--block-size)), 0);
+        transform: translate(calc(0px - var(--block-size)), 0);
     }
 }
 

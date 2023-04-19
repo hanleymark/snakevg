@@ -9,7 +9,7 @@ export class Board {
     borderColour = "turquoise",
     backgroundColour = "#000",
     snakeDirection = Direction.right,
-    tickMS = 200
+    tickMS = 250
   ) {
     this.width = width;
     this.height = height;
@@ -61,7 +61,7 @@ export class Board {
     }
   }
 
-  setUpSnake(length = 3) {
+  setUpSnake(length = 10) {
     let x = Math.floor(this.width / 2);
     let y = Math.floor(this.height / 2);
 
@@ -83,12 +83,25 @@ export class Board {
   displaySnake() {
     // Clear snake element of all children
     this.snakeElement.innerHTML = "";
+    // Declare eye elements
+    let svgLeftEyeGroup;
+    let svgRightEyeGroup;
+    let svgEyeWhite;
+    let svgEyeBlack;
     // Iterate backwards through snake array and create svg elements for each part
     this.snake.reduceRight((_, part) => {
+      const svgSnakeSectionGroup = document.createElementNS(
+        this.svgNamespace,
+        "g"
+      );
       const svgCircle = document.createElementNS(this.svgNamespace, "circle");
 
-      let cssAnimation;
+      svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
+      svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
+      svgCircle.setAttributeNS(null, "r", this.blockSize / 1.75);
+      //if (part.direction === Direction.up || part.direction === Direction.down)
 
+      let cssAnimation;
       switch (part.direction) {
         case Direction.up:
           cssAnimation = "animate-up";
@@ -104,24 +117,107 @@ export class Board {
           break;
       }
 
-      svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
-      svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
-      svgCircle.setAttributeNS(null, "r", this.blockSize / 2);
-
-      svgCircle.setAttributeNS(
+      svgSnakeSectionGroup.setAttributeNS(
         null,
         "class",
         `${part.partName} ${cssAnimation}`
       );
 
+      // Set up animation end event listener to head element to call game loop iteration
       if (part.partName === "snake-head") {
-        svgCircle.addEventListener("animationend", () => {
+        // Set up eye svg elements for snake head
+
+        // Set up position shift for eyes based on direction
+        const isUpDown =
+          part.direction === Direction.up || part.direction === Direction.down;
+        const eyeOffset = {
+          x: isUpDown ? this.blockSize / 3 : 0,
+          y: isUpDown ? 0 : this.blockSize / 3,
+        };
+
+        let nudge = this.blockSize / 4;
+        let eyesToFrontX = 0;
+        let eyesToFrontY = 0;
+
+        // Add in extra shift to move eyes to front of head
+        switch (part.direction) {
+          case Direction.up:
+            eyesToFrontY = -nudge;
+            break;
+          case Direction.down:
+            eyesToFrontY = nudge;
+            break;
+          case Direction.left:
+            eyesToFrontX = -nudge;
+            break;
+          case Direction.right:
+            eyesToFrontX = nudge;
+            break;
+        }
+
+        svgLeftEyeGroup = document.createElementNS(this.svgNamespace, "g");
+        svgEyeWhite = document.createElementNS(this.svgNamespace, "circle");
+        svgEyeBlack = document.createElementNS(this.svgNamespace, "circle");
+        svgEyeWhite.setAttributeNS(null, "r", this.blockSize / 4);
+        svgEyeBlack.setAttributeNS(null, "r", this.blockSize / 8);
+        svgEyeWhite.setAttributeNS(null, "class", "snake-eye-white");
+        svgEyeBlack.setAttributeNS(null, "class", "snake-eye-black");
+        svgEyeWhite.setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize - eyeOffset.x + eyesToFrontX
+        );
+        svgEyeWhite.setAttributeNS(
+          null,
+          "cy",
+          part.y * this.blockSize - eyeOffset.y + eyesToFrontY
+        );
+        svgEyeBlack.setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize - eyeOffset.x + eyesToFrontX
+        );
+        svgEyeBlack.setAttributeNS(
+          null,
+          "cy",
+          part.y * this.blockSize - eyeOffset.y + eyesToFrontY
+        );
+        svgLeftEyeGroup.appendChild(svgEyeWhite);
+        svgLeftEyeGroup.appendChild(svgEyeBlack);
+        svgRightEyeGroup = svgLeftEyeGroup.cloneNode(true);
+        svgRightEyeGroup.childNodes[0].setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize + eyeOffset.x + eyesToFrontX
+        );
+        svgRightEyeGroup.childNodes[1].setAttributeNS(
+          null,
+          "cx",
+          part.x * this.blockSize + eyeOffset.x + eyesToFrontX
+        );
+        svgRightEyeGroup.childNodes[0].setAttributeNS(
+          null,
+          "cy",
+          part.y * this.blockSize + eyeOffset.y + eyesToFrontY
+        );
+        svgRightEyeGroup.childNodes[1].setAttributeNS(
+          null,
+          "cy",
+          part.y * this.blockSize + eyeOffset.y + eyesToFrontY
+        );
+        // Set up animation end event listener to head element to call game loop iteration
+        svgSnakeSectionGroup.addEventListener("animationend", () => {
           this.gameLoop();
         });
       }
-
       this.snakeElement.appendChild(svgCircle);
-    },null);
+      svgSnakeSectionGroup.appendChild(svgCircle);
+      if (svgLeftEyeGroup) {
+        svgSnakeSectionGroup.appendChild(svgLeftEyeGroup);
+        svgSnakeSectionGroup.appendChild(svgRightEyeGroup);
+      }
+      this.snakeElement.appendChild(svgSnakeSectionGroup);
+    }, null);
 
     this.boardElement.appendChild(this.snakeElement);
   }
