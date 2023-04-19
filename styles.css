@@ -40,6 +40,14 @@ body {
     stroke: none;
 }
 
+.snake-eyelid {
+    fill: #4c8354;
+    stroke: #506b54;
+    stroke-width: 2px;
+    z-index: 4;
+    visibility: hidden;
+}
+
 .board {
     border: 16px solid var(--board-border-color);
     background-color: var(--board-bg-color);
@@ -111,5 +119,19 @@ body {
 
     to {
         transform: translate(var(--block-size), 0);
+    }
+}
+
+.blink-animation {
+    animation: blink 0.2s steps(2);
+    animation-iteration-count: 2;
+}
+
+@keyframes blink {
+    from {
+        visibility: hidden;
+    }
+    to {
+        visibility: visible;
     }
 }
