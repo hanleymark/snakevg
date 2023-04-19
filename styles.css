@@ -40,11 +40,6 @@ body {
     stroke: none;
 }
 
-.rotate-90 g {
-    transform-origin: 50% 50%;
-    transform: rotate(90deg);
-}
-
 .board {
     border: 16px solid var(--board-border-color);
     background-color: var(--board-bg-color);
