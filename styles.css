@@ -15,15 +15,14 @@ body {
 }
 
 .snake-head {
-    fill: #506b54;
-    stroke: #4c8354;
+    fill: #a6a6a6;
+    stroke: #555;
     stroke-width: 2px;
     z-index: 1;
 }
 
 .snake-body {
-    fill: #8cbc93;
-    stroke: #4c8354;
+    stroke: #555;
     stroke-width: 2px;
     z-index: 1;
 }
@@ -41,11 +40,10 @@ body {
 }
 
 .snake-eyelid {
-    fill: #4c8354;
-    stroke: #506b54;
+    fill: #999;
+    stroke: #555;
     stroke-width: 2px;
     z-index: 4;
-    visibility: hidden;
 }
 
 .board {
@@ -54,8 +52,12 @@ body {
     border-radius: calc(var(--block-size) / 2);
 }
 
-.food {
-    fill: #f00;
+.visible {
+    visibility: visible;
+}
+
+.invisible {
+    visibility: hidden;
 }
 
 .animate-up {
@@ -122,16 +124,24 @@ body {
     }
 }
 
-.blink-animation {
-    animation: blink 0.2s steps(2);
-    animation-iteration-count: 2;
+.snake-body:nth-child(7n) {
+    fill: red;
 }
-
-@keyframes blink {
-    from {
-        visibility: hidden;
-    }
-    to {
-        visibility: visible;
-    }
+.snake-body:nth-child(7n + 1) {
+    fill: orange;
+}
+.snake-body:nth-child(7n + 2) {
+    fill: yellow;
+}
+.snake-body:nth-child(7n + 3) {
+    fill: rgb(95, 250, 95);
+}
+.snake-body:nth-child(7n + 4) {
+    fill: blue;
+}
+.snake-body:nth-child(7n + 5) {
+    fill: rgb(148, 67, 206);
+}
+.snake-body:nth-child(7n + 6) {
+    fill: violet;
 }
