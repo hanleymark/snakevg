@@ -61,7 +61,7 @@ export class Board {
     }
   }
 
-  setUpSnake(length = 10) {
+  setUpSnake(length = 3) {
     let x = Math.floor(this.width / 2);
     let y = Math.floor(this.height / 2);
 
@@ -219,14 +219,14 @@ export class Board {
         svgSnakeSectionGroup.appendChild(svgRightEyeGroup);
         const svgLeftEyelid = svgLeftEyeGroup.childNodes[0].cloneNode(true);
         const svgRightEyelid = svgRightEyeGroup.childNodes[0].cloneNode(true);
-        svgLeftEyelid.setAttributeNS(null, "class", "snake-eyelid");
-        svgRightEyelid.setAttributeNS(null, "class", "snake-eyelid");
+        svgLeftEyelid.setAttributeNS(null, "class", "snake-eyelid invisible");
+        svgRightEyelid.setAttributeNS(null, "class", "snake-eyelid invisible");
         svgSnakeSectionGroup.appendChild(svgLeftEyelid);
         svgSnakeSectionGroup.appendChild(svgRightEyelid);
         // Randomly decide whether to blink eyes
-        if (Math.random() < 0.2) {
-          svgLeftEyelid.setAttributeNS(null, "class", "blink-animation");
-          svgRightEyelid.setAttributeNS(null, "class", "blink-animation");
+        if (Math.random() < 0.1) {
+          svgLeftEyelid.setAttributeNS(null, "class", "visible snake-eyelid");
+          svgRightEyelid.setAttributeNS(null, "class", "visible snake-eyelid");
         }
       }
 
