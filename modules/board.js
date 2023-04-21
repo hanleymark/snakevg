@@ -289,6 +289,7 @@ export class Board {
 
     this.snake.unshift(newSnakeHead);
     // Display snake
+    console.log(this.snake);
     this.displaySnake();
   }
 
@@ -428,8 +429,8 @@ function FoodItem(x, y, path, svgNamespace, blockSize) {
   this.imageElement = () => {
     const svgImageElement = document.createElementNS(svgNamespace, "image");
     svgImageElement.setAttributeNS(null, "href", this.path);
-    svgImageElement.setAttributeNS(null, "x", this.x * this.blockSize / 2);
-    svgImageElement.setAttributeNS(null, "y", this.y * this.blockSize / 2);
+    svgImageElement.setAttributeNS(null, "x", (this.x - 1) * this.blockSize / 2);
+    svgImageElement.setAttributeNS(null, "y", (this.y - 1) * this.blockSize / 2);
     console.log(`x: ${this.x * this.blockSize}, y: ${this.y * this.blockSize}`);
     svgImageElement.setAttributeNS(null, "width", blockSize);
     svgImageElement.setAttributeNS(null, "height", blockSize);
