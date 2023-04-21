@@ -1,6 +1,6 @@
 html {
     /* Set default values for board colours and block size */
-    --board-border-color: #82beec;
+    --board-border-color: #00f7ff;
     --board-bg-color: #000;
     --block-size: 16px;
     --tick-ms: 250ms;
@@ -46,8 +46,13 @@ body {
     z-index: 4;
 }
 
+.food-rect {
+    filter: drop-shadow(-1rem -1rem 1rem #fff);
+    fill: #ff0000;
+}
+
 .board {
-    border: 16px solid var(--board-border-color);
+    border: var(--block-size) solid var(--board-border-color);
     background-color: var(--board-bg-color);
     border-radius: calc(var(--block-size) / 2);
 }

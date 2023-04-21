@@ -6,7 +6,7 @@ export class Board {
     height,
     blockSize,
     backgroundImage = null,
-    borderColour = "turquoise",
+    borderColour = "#00f7ff",
     backgroundColour = "#000",
     snakeDirection = Direction.right,
     tickMS = 250
@@ -20,10 +20,13 @@ export class Board {
     this.boardElement = document.createElementNS(this.svgNamespace, "svg");
     this.snakeElement = document.createElementNS(this.svgNamespace, "g");
     this.snake = [];
-    this.food = null;
+    this.allFoodItems = this.setUpFoodItems();
+    console.log(this.allFoodItems);
+    this.foodItemIterator = 0;
     this.setUpBoard(borderColour, backgroundColour, backgroundImage);
     this.setUpSnake();
     this.displaySnake();
+    this.displayFood();
     this.setUpKeyboardListeners();
     // this.tick = setInterval(this.gameLoop.bind(this), tickMS);
   }
@@ -61,7 +64,7 @@ export class Board {
     }
   }
 
-  setUpSnake(length = 3) {
+  setUpSnake(length = 10) {
     let x = Math.floor(this.width / 2);
     let y = Math.floor(this.height / 2);
 
@@ -100,7 +103,7 @@ export class Board {
       svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
       svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
       svgCircle.setAttributeNS(null, "r", this.blockSize / 1.75);
-
+// 
       let cssAnimation;
       switch (part.direction) {
         case Direction.up:
@@ -245,8 +248,13 @@ export class Board {
 
     // Get the x and y increments for the snake's direction
     const increment = this.getXYIncrement(this.snakeDirection);
-    const nextX = this.snake[0].x + increment.x;
-    const nextY = this.snake[0].y + increment.y;
+    let nextX = this.snake[0].x + increment.x;
+    let nextY = this.snake[0].y + increment.y;
+
+    if (nextX > this.width + 1) {nextX = -1;}
+    if (nextX < -1) {nextX = this.width + 1;}
+    if (nextY > this.height + 1) {nextY = -1;}
+    if (nextY < -1) {nextY = this.height + 1;}
 
     // Remove the tail element from the snake array
     this.snake.pop();
@@ -325,6 +333,83 @@ export class Board {
     }
     return increment;
   }
+
+  setUpFoodItems() {
+    const allTechImagePaths = [
+      "./images/tech-icons/aws.svg",
+      "./images/tech-icons/css.svg",
+      "./images/tech-icons/docker.svg",
+      "./images/tech-icons/eslint.svg",
+      "./images/tech-icons/git.svg",
+      "./images/tech-icons/github.svg",
+      "./images/tech-icons/graphql.svg",
+      "./images/tech-icons/html.svg",
+      "./images/tech-icons/js.svg",
+      "./images/tech-icons/json.svg",
+      "./images/tech-icons/kubernetes.svg",
+      "./images/tech-icons/linux.svg",
+      "./images/tech-icons/netlify.svg",
+      "./images/tech-icons/nextjs.svg",
+      "./images/tech-icons/node.svg",
+      "./images/tech-icons/npm.svg",
+      "./images/tech-icons/openai.svg",
+      "./images/tech-icons/postgresql.svg",
+      "./images/tech-icons/prettier.svg",
+      "./images/tech-icons/react.svg",
+      "./images/tech-icons/vscode.svg",
+    ];
+
+    const foodItems = [];
+    for (let imagePath of allTechImagePaths) {
+      const foodItem = new FoodItem(
+        null, // Leave out x position for now
+        null, // Leave out y position for now
+        imagePath,
+        this.svgNamespace,
+        this.blockSize * 2
+      );
+      foodItems.push(foodItem);
+    }
+    return foodItems;
+  }
+
+  displayFood() {
+    // Remove any food items from the board
+    const oldFoodItem = document.querySelector(".food-item");
+    if (oldFoodItem) {
+      oldFoodItem.remove();
+    }
+
+    // Display food item and post increment foodItemIterator to next food item
+    const newFoodItem = this.allFoodItems[this.foodItemIterator++];
+    const position = this.getRandomEmptyPosition();
+    newFoodItem.x = position.x;
+    newFoodItem.y = position.y;
+    this.boardElement.appendChild(newFoodItem.imageElement());
+  }
+
+  getRandomEmptyPosition() {
+    let xCoord, yCoord;
+    let positionIsEmpty = false;
+    while (!positionIsEmpty) {
+      xCoord = Math.floor(Math.random() * (this.width - 2)) + 1;
+      yCoord = Math.floor(Math.random() * (this.height - 2)) + 1;
+      positionIsEmpty = this.isPositionEmpty(xCoord, yCoord);
+    }
+    console.log(`x: ${xCoord}, y: ${yCoord}`);
+    return { x: xCoord, y: yCoord };
+  }
+
+  isPositionEmpty(x, y) {
+    let isPositionEmpty = true;
+    for (let snakePart of this.snake) {
+      if (snakePart.x === x && snakePart.y === y) {
+        isPositionEmpty = false;
+        break;
+      }
+    }
+    return isPositionEmpty;
+  }
 }
 
 function SnakePart(x, y, partName, direction) {
@@ -332,4 +417,23 @@ function SnakePart(x, y, partName, direction) {
   this.y = y;
   this.partName = partName;
   this.direction = direction;
+}
+
+function FoodItem(x, y, path, svgNamespace, blockSize) {
+  this.x = x;
+  this.y = y;
+  this.path = path;
+  this.svgNamespace = svgNamespace;
+  this.blockSize = blockSize;
+  this.imageElement = () => {
+    const svgImageElement = document.createElementNS(svgNamespace, "image");
+    svgImageElement.setAttributeNS(null, "href", this.path);
+    svgImageElement.setAttributeNS(null, "x", this.x * this.blockSize / 2);
+    svgImageElement.setAttributeNS(null, "y", this.y * this.blockSize / 2);
+    console.log(`x: ${this.x * this.blockSize}, y: ${this.y * this.blockSize}`);
+    svgImageElement.setAttributeNS(null, "width", blockSize);
+    svgImageElement.setAttributeNS(null, "height", blockSize);
+    svgImageElement.setAttributeNS(null, "class", "food-item");
+    return svgImageElement;
+  };
 }
