@@ -132,21 +132,21 @@ body {
 .snake-body:nth-child(7n) {
     fill: red;
 }
-.snake-body:nth-child(7n + 1) {
+.snake-body:nth-child(7n - 1) {
     fill: orange;
 }
-.snake-body:nth-child(7n + 2) {
+.snake-body:nth-child(7n - 2) {
     fill: yellow;
 }
-.snake-body:nth-child(7n + 3) {
+.snake-body:nth-child(7n - 3) {
     fill: rgb(95, 250, 95);
 }
-.snake-body:nth-child(7n + 4) {
+.snake-body:nth-child(7n - 4) {
     fill: blue;
 }
-.snake-body:nth-child(7n + 5) {
+.snake-body:nth-child(7n - 5) {
     fill: rgb(148, 67, 206);
 }
-.snake-body:nth-child(7n + 6) {
+.snake-body:nth-child(7n - 6) {
     fill: violet;
 }
