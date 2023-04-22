@@ -295,9 +295,14 @@ export class Board {
 
     // Check if snake has collided with food item
     const currentFoodItem = this.allFoodItems[this.foodItemIterator];
-    console.log(currentFoodItem);
     if (this.snake[0].x === currentFoodItem.x && this.snake[0].y === currentFoodItem.y) {
       this.score += 100;
+      this.tickMS -= 5;
+      if (this.tickMS < 50) {
+        this.tickMS = 50;
+      }
+      const docRoot = document.querySelector("html");
+      docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
       this.growSnake = true;
       this.foodItemIterator = (this.foodItemIterator + 1) % this.allFoodItems.length;
       this.displayFood();
