@@ -4,6 +4,8 @@ html {
     --board-bg-color: #000;
     --block-size: 16px;
     --tick-ms: 250ms;
+    --centre-x: 0;
+    --centre-y: 0;
 }
 
 body {
@@ -44,11 +46,6 @@ body {
     stroke: #555;
     stroke-width: 2px;
     z-index: 4;
-}
-
-.food-rect {
-    filter: drop-shadow(-1rem -1rem 1rem #fff);
-    fill: #ff0000;
 }
 
 .board {
@@ -149,4 +146,40 @@ body {
 }
 .snake-body:nth-child(7n - 6) {
     fill: violet;
+}
+
+.animate-food-in {
+    animation-name: food-in;
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.25, 0.25, 0.5, 1.5);;
+    transform-origin: 50% 50%;
+}
+
+@keyframes food-in {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-food-out {
+    animation-name: food-out;
+    animation-duration: var(--tick-ms);
+    animation-timing-function: cubic-bezier(0.25, 0.25, 0.5, 1.5);;
+    /* transform-origin: 100% 100%; */
+}
+
+@keyframes food-out {
+    from {
+        width: var(--block-size);
+        height: var(--block-size);
+    }
+    to{
+        width: 0;
+        height: 0;
+    }
 }
