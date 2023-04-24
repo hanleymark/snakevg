@@ -166,20 +166,19 @@ body {
     }
 }
 
-.animate-food-out {
-    animation-name: food-out;
-    animation-duration: var(--tick-ms);
-    animation-timing-function: cubic-bezier(0.25, 0.25, 0.5, 1.5);;
-    /* transform-origin: 100% 100%; */
+.snake-collision {
+    animation-name: snake-crash;
+    animation-duration: 800ms;
+    animation-timing-function: ease-in;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
 }
 
-@keyframes food-out {
+@keyframes snake-crash {
     from {
-        width: var(--block-size);
-        height: var(--block-size);
+        transform: translateY(0)
     }
-    to{
-        width: 0;
-        height: 0;
+    to {
+        transform: translateY(100%);
     }
 }

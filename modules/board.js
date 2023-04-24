@@ -24,6 +24,7 @@ export class Board {
     this.foodItemIterator = 0;
     this.score = 0;
     this.growSnake = false;
+    this.colliding = false;
     this.setUpBoard(borderColour, backgroundColour, backgroundImage);
     this.setUpSnake();
     this.displaySnake();
@@ -41,8 +42,14 @@ export class Board {
     docRoot.style.setProperty("--board-border-color", borderColour);
     docRoot.style.setProperty("--board-bg-color", backgroundColour);
     docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
-    docRoot.style.setProperty("--centre-x", `${this.width * this.blockSize/ 2}`);
-    docRoot.style.setProperty("--centre-y", `${this.height * this.blockSize / 2}`);
+    docRoot.style.setProperty(
+      "--centre-x",
+      `${(this.width * this.blockSize) / 2}`
+    );
+    docRoot.style.setProperty(
+      "--centre-y",
+      `${(this.height * this.blockSize) / 2}`
+    );
 
     // Set board svg element size
     this.boardElement.setAttributeNS(
@@ -105,8 +112,9 @@ export class Board {
       svgCircle.setAttributeNS(null, "cx", part.x * this.blockSize);
       svgCircle.setAttributeNS(null, "cy", part.y * this.blockSize);
       svgCircle.setAttributeNS(null, "r", this.blockSize / 1.75);
-// 
+      //
       let cssAnimation;
+
       switch (part.direction) {
         case Direction.up:
           cssAnimation = "animate-up";
@@ -120,6 +128,10 @@ export class Board {
         case Direction.right:
           cssAnimation = "animate-right";
           break;
+      }
+
+      if (this.colliding) {
+        cssAnimation = "";
       }
 
       svgSnakeSectionGroup.setAttributeNS(
@@ -213,9 +225,11 @@ export class Board {
           part.y * this.blockSize + eyeOffset.y + eyesToFrontY
         );
         // Set up animation end event listener to head element to call game loop iteration
-        svgSnakeSectionGroup.addEventListener("animationend", () => {
-          this.gameLoop();
-        });
+        if (!this.colliding) {
+          svgSnakeSectionGroup.addEventListener("animationend", () => {
+            this.gameLoop();
+          });
+        }
       }
       this.snakeElement.appendChild(svgCircle);
       svgSnakeSectionGroup.appendChild(svgCircle);
@@ -239,6 +253,9 @@ export class Board {
     }, null);
 
     this.boardElement.appendChild(this.snakeElement);
+    if (this.colliding) {
+      this.gameOver();
+    }
   }
 
   gameLoop() {
@@ -253,14 +270,22 @@ export class Board {
     let nextX = this.snake[0].x + increment.x;
     let nextY = this.snake[0].y + increment.y;
 
-    if (nextX > this.width + 1) {nextX = -1;}
-    if (nextX < -1) {nextX = this.width + 1;}
-    if (nextY > this.height + 1) {nextY = -1;}
-    if (nextY < -1) {nextY = this.height + 1;}
+    if (nextX > this.width + 1) {
+      nextX = -1;
+    }
+    if (nextX < -1) {
+      nextX = this.width + 1;
+    }
+    if (nextY > this.height + 1) {
+      nextY = -1;
+    }
+    if (nextY < -1) {
+      nextY = this.height + 1;
+    }
 
     // Remove the tail element from the snake array if snake has not just eaten food
     if (!this.growSnake) {
-    this.snake.pop();
+      this.snake.pop();
     } else {
       this.growSnake = false;
     }
@@ -293,11 +318,19 @@ export class Board {
       }
     }
 
+    // Check if snake has collided with itself
+    if (!this.isPositionEmpty(newSnakeHead.x, newSnakeHead.y)) {
+      this.colliding = true;
+    }
+
     this.snake.unshift(newSnakeHead);
 
     // Check if snake has collided with food item
     const currentFoodItem = this.allFoodItems[this.foodItemIterator];
-    if (this.snake[0].x === currentFoodItem.x && this.snake[0].y === currentFoodItem.y) {
+    if (
+      this.snake[0].x === currentFoodItem.x &&
+      this.snake[0].y === currentFoodItem.y
+    ) {
       this.score += 100;
       this.tickMS -= 5;
       if (this.tickMS < 50) {
@@ -306,7 +339,8 @@ export class Board {
       const docRoot = document.querySelector("html");
       docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
       this.growSnake = true;
-      this.foodItemIterator = (this.foodItemIterator + 1) % this.allFoodItems.length;
+      this.foodItemIterator =
+        (this.foodItemIterator + 1) % this.allFoodItems.length;
       this.displayFood();
     }
 
@@ -410,9 +444,13 @@ export class Board {
     newFoodItem.x = position.x;
     newFoodItem.y = position.y;
     const newFoodItemElement = newFoodItem.imageElement();
-    newFoodItemElement.setAttributeNS(null, "class", "food-item animate-food-in");
+    newFoodItemElement.setAttributeNS(
+      null,
+      "class",
+      "food-item animate-food-in"
+    );
     setTimeout(() => {
-    this.boardElement.appendChild(newFoodItemElement);
+      this.boardElement.appendChild(newFoodItemElement);
     }, 1000);
   }
 
@@ -437,6 +475,27 @@ export class Board {
     }
     return isPositionEmpty;
   }
+
+  gameOver() {
+    let animationPauseMS = 500;
+
+    const snakeElements = document.querySelectorAll(".snake-body");
+    const snakeHeadElement = document.querySelector(".snake-head");
+    console.log(snakeHeadElement);
+    snakeElements.forEach((element) => {
+      setTimeout(() => {
+        element.setAttributeNS(null, "class", "snake-body snake-collision");
+      }, animationPauseMS);
+      animationPauseMS += 50;
+    });
+    setTimeout(() => {
+      snakeHeadElement.setAttributeNS(
+        null,
+        "class",
+        "snake-head snake-collision"
+      );
+    }, animationPauseMS);
+  }
 }
 
 function SnakePart(x, y, partName, direction) {
@@ -455,8 +514,16 @@ function FoodItem(x, y, path, svgNamespace, blockSize) {
   this.imageElement = () => {
     const svgImageElement = document.createElementNS(svgNamespace, "image");
     svgImageElement.setAttributeNS(null, "href", this.path);
-    svgImageElement.setAttributeNS(null, "x", (this.x - 1) * this.blockSize / 2);
-    svgImageElement.setAttributeNS(null, "y", (this.y - 1) * this.blockSize / 2);
+    svgImageElement.setAttributeNS(
+      null,
+      "x",
+      ((this.x - 1) * this.blockSize) / 2
+    );
+    svgImageElement.setAttributeNS(
+      null,
+      "y",
+      ((this.y - 1) * this.blockSize) / 2
+    );
     svgImageElement.setAttributeNS(null, "width", blockSize);
     svgImageElement.setAttributeNS(null, "height", blockSize);
     svgImageElement.setAttributeNS(null, "class", "food-item");
