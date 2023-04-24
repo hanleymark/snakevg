@@ -41,6 +41,8 @@ export class Board {
     docRoot.style.setProperty("--board-border-color", borderColour);
     docRoot.style.setProperty("--board-bg-color", backgroundColour);
     docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
+    docRoot.style.setProperty("--centre-x", `${this.width * this.blockSize/ 2}`);
+    docRoot.style.setProperty("--centre-y", `${this.height * this.blockSize / 2}`);
 
     // Set board svg element size
     this.boardElement.setAttributeNS(
@@ -92,7 +94,7 @@ export class Board {
     let svgEyeWhite;
     let svgEyeBlack;
 
-    // Iterate backwards through snake array and create svg elements for each part
+    // Iterate through snake array and create svg elements for each part
     this.snake.reduceRight((_, part) => {
       const svgSnakeSectionGroup = document.createElementNS(
         this.svgNamespace,
@@ -405,7 +407,11 @@ export class Board {
     const position = this.getRandomEmptyPosition();
     newFoodItem.x = position.x;
     newFoodItem.y = position.y;
-    this.boardElement.appendChild(newFoodItem.imageElement());
+    const newFoodItemElement = newFoodItem.imageElement();
+    newFoodItemElement.setAttributeNS(null, "class", "animate-food-in food-item");
+    setTimeout(() => {
+    this.boardElement.appendChild(newFoodItemElement);
+    }, 1000);
   }
 
   getRandomEmptyPosition() {
