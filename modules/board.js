@@ -397,9 +397,11 @@ export class Board {
 
   displayFood() {
     // Remove any food items from the board
-    const oldFoodItem = document.querySelector(".food-item");
-    if (oldFoodItem) {
-      oldFoodItem.remove();
+    const oldFoodItems = document.querySelectorAll(".food-item");
+    if (oldFoodItems) {
+      for (let foodItem of oldFoodItems) {
+        foodItem.remove();
+      }
     }
 
     // Display food item
@@ -408,7 +410,7 @@ export class Board {
     newFoodItem.x = position.x;
     newFoodItem.y = position.y;
     const newFoodItemElement = newFoodItem.imageElement();
-    newFoodItemElement.setAttributeNS(null, "class", "animate-food-in food-item");
+    newFoodItemElement.setAttributeNS(null, "class", "food-item animate-food-in");
     setTimeout(() => {
     this.boardElement.appendChild(newFoodItemElement);
     }, 1000);
