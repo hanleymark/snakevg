@@ -339,6 +339,10 @@ export class Board {
       const docRoot = document.querySelector("html");
       docRoot.style.setProperty("--tick-ms", `${this.tickMS}ms`);
       this.growSnake = true;
+      // Remove positioning of old food item
+      this.allFoodItems[this.foodItemIterator].x = -10;
+      this.allFoodItems[this.foodItemIterator].y = -10;
+
       this.foodItemIterator =
         (this.foodItemIterator + 1) % this.allFoodItems.length;
       this.displayFood();
@@ -431,25 +435,25 @@ export class Board {
 
   displayFood() {
     // Remove any food items from the board
-    const oldFoodItems = document.querySelectorAll(".food-item");
+    let oldFoodItems = document.querySelectorAll(".food-item");
     if (oldFoodItems) {
       for (let foodItem of oldFoodItems) {
         foodItem.remove();
       }
     }
 
-    // Display food item
-    const newFoodItem = this.allFoodItems[this.foodItemIterator];
-    const position = this.getRandomEmptyPosition();
-    newFoodItem.x = position.x;
-    newFoodItem.y = position.y;
-    const newFoodItemElement = newFoodItem.imageElement();
-    newFoodItemElement.setAttributeNS(
-      null,
-      "class",
-      "food-item animate-food-in"
-    );
     setTimeout(() => {
+      // Display food item after delay
+      const newFoodItem = this.allFoodItems[this.foodItemIterator];
+      const position = this.getRandomEmptyPosition();
+      newFoodItem.x = position.x;
+      newFoodItem.y = position.y;
+      const newFoodItemElement = newFoodItem.imageElement();
+      newFoodItemElement.setAttributeNS(
+        null,
+        "class",
+        "food-item animate-food-in"
+      );
       this.boardElement.appendChild(newFoodItemElement);
     }, 1000);
   }
